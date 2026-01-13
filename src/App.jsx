@@ -2,16 +2,21 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header.jsx";
 import BottomTabs from "./components/BottomTabs.jsx";
-import FabStack from "./components/FabStack.jsx";
 import Footer from "./components/Footer.jsx";
 import ServicePage from "./pages/ServicePage.jsx";
 import Home from "./pages/Home.jsx";
 import Services from "./pages/Services.jsx";
 import Contact from "./pages/Contact.jsx";
-
 import Denim from "./pages/Denim.jsx";
-
 import { CartProvider } from "./providers/CartProvider.jsx";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard"; 
+import AdminGuard from "./components/AdminGuard.jsx";
+
+
+
+
+
 
 export default function App() {
   return (
@@ -19,7 +24,7 @@ export default function App() {
       <div className="min-h-dvh bg-premium text-white">
         <Header />
 
-        <main className="pb-24 md:pb-8">
+      <main className="pt-[calc(var(--header-h,88px)+12px)]">
           <Routes>
             <Route path="/" element={<Home />} />
 
@@ -31,10 +36,22 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+<Route
+  path="/admin/dashboard"
+  element={
+    <AdminGuard>
+      <AdminDashboard />
+    </AdminGuard>
+  }
+/>
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
           </Routes>
         </main>
 
-        <FabStack />
+      
         <BottomTabs />
         <Footer />
       </div>

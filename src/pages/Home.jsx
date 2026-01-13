@@ -21,7 +21,7 @@ export default function Home() {
       {/* HERO */}
       {/* HERO (full image + overlay text) */}
 <section id="hero" className="relative">
-  <div className="relative mx-auto w-full max-w-6xl px-4 md:px-6 pt-6 md:pt-10 pb-10">
+  <div className="relative mx-auto w-full max-w-6xl px-4 md:px-6 pt-4 md:pt-8 pb-10">
     <div className="relative overflow-hidden rounded-3xl border border-white/10">
       {/* Full image background */}
       <div className="absolute inset-0">
@@ -38,7 +38,7 @@ export default function Home() {
       </div>
 
       {/* Content */}
-      <div className="relative px-5 pt-24 pb-10 md:px-10 md:pt-28 md:pb-16">
+      <div className="relative px-5 pt-16 pb-10 md:px-10 md:pt-20 md:pb-16">
         <div className="text-xs uppercase tracking-[0.18em] text-white/70">
           BIGFARRYS • Lagos (Ikorodu) • Ilaro, Ogun State
         </div>
@@ -49,7 +49,9 @@ export default function Home() {
         </h1>
 
         <p className="mt-4 max-w-xl text-sm md:text-base text-white/75">
-          Ads. Edits. CAC. Signage. One premium home — choose a service, submit details, upload proof, and send a clean summary.
+          At BIGFARRYS, we believe your business, brand, and personal style deserve nothing less than excellence. That’s why we’ve created a full range of services designed to elevate you, your ideas, and your visibility.
+Tell us which of our services do you need today? 🫶🏽
+
         </p>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -119,7 +121,7 @@ export default function Home() {
       {/* SERVICES */}
       <SnapSection id="services">
         <ServicesGrid />
-        <SectionNav prevId="collage" nextId="how-it-works" />
+        <SectionNav prevId="gallery" nextId="how-it-works" />
       </SnapSection>
 
       {/* HOW IT WORKS */}

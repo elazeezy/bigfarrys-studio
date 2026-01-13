@@ -20,7 +20,7 @@ export const services = [
     short: "Promotional content that gets your brand seen and noticed.",
     desc:
       "Get your brand seen, heard, and noticed with quality promotional content that attracts the right audience.",
-    sampleImage: "/services/advert-sample.jpg",
+    sampleImage: "/services/advert-hero.jpg",
     reviewsImages: ["/reviews/advert-1.jpg", "/reviews/advert-2.jpg", "/reviews/advert-3.jpg"],
 
     packages: [
@@ -60,7 +60,7 @@ export const services = [
     desc:
       "From simple touch-ups to full transformations, our editing brings your images to life with clarity, style, and creativity.",
 
-    sampleImage: "/services/editing/sample.jpg",
+    sampleImage: "/services/editing-hero.jpg",
     reviewImages: [
       "/services/editing/review-1.jpg",
       "/services/editing/review-2.jpg",
@@ -104,7 +104,7 @@ export const services = [
     short: "We handle the paperwork — you focus on business.",
     desc:
       "Let us handle the paperwork, the stress, and the process. You focus on your business — we’ll get you registered seamlessly.",
-    sampleImage: "/services/cac/sample.jpg",
+    sampleImage: "/services/cac-hero.jpg",
     reviewImages: ["/services/cac/review-1.jpg", "/services/cac/review-2.jpg"],
     packages: [
       { id: "cac-basic", group: "CAC", name: "Business Name Registration", price: null, eta: "Depends on CAC" },
@@ -119,7 +119,7 @@ export const services = [
     short: "Bold signage and prints that make your brand impossible to ignore.",
     desc:
       "Stand out from the crowd with bold, professional signage that makes your brand impossible to ignore.",
-    sampleImage: "/services/signage/sample.jpg",
+    sampleImage: "/services/signage-hero.jpg",
     reviewImages: ["/services/signage/review-1.jpg", "/services/signage/review-2.jpg"],
     packages: [
       { id: "sign-basic", group: "Signs & Prints", name: "Design + Print Prep", price: null, eta: "1–3 days" }
