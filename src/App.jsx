@@ -13,11 +13,6 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard"; 
 import AdminGuard from "./components/AdminGuard.jsx";
 
-
-
-
-
-
 export default function App() {
   return (
     <CartProvider>
@@ -36,19 +31,14 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-<Route
-  path="/admin/dashboard"
-  element={
-    <AdminGuard>
-      <AdminDashboard />
-    </AdminGuard>
-  }
-/>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            {/* Admin Routes */}
+  <Route path="/admin/login" element={<AdminLogin />} />
+  <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+  <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
 
-          </Routes>
+  {/* CATCH-ALL MUST BE LAST */}
+  <Route path="*" element={<Navigate to="/" replace />} />
+</Routes>
         </main>
 
       

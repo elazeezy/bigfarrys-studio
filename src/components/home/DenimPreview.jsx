@@ -1,51 +1,42 @@
-// src/components/home/DenimPreview.jsx
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import ImgOrPlaceholder from "./ImgOrPlaceholder.jsx";
 
 const DENIM = [
-  "/home/collage/denim-1.jpg",
-  "/home/collage/denim-2.jpg",
-  "/home/collage/denim-1.jpg",
+  { src: "/denim/look-01.jpg", label: "STREET" },
+  { src: "/denim/look-02.jpg", label: "LUXE" },
+  { src: "/denim/look-03.jpg", label: "CLASSIC" },
 ];
 
 export default function DenimPreview() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-white/60">Denim Hub</div>
-          <h2 className="mt-2 text-2xl md:text-4xl font-extrabold tracking-tight">
-            Lifestyle. Proof. Drops.
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm md:text-base text-white/70">
-            Not a shop — just vibes + proof. Order when ready.
-          </p>
+    <div className="relative group">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div className="space-y-2">
+          <span className="text-pink-500 font-black tracking-[0.4em] text-[10px] uppercase">Lifestyle Hub</span>
+          <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter">PROOF.<br/><span className="italic font-serif opacity-50">DROPS.</span></h2>
         </div>
-
-        <Link
-          to="/denim-hub"
-          className="hidden md:inline-flex rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-extrabold hover:bg-white/10"
-        >
-          Visit Denim Hub →
+        <Link to="/denim-hub" className="group flex items-center gap-4 bg-white text-navy-base px-8 py-4 rounded-full font-black text-sm transition-transform hover:scale-105">
+          VISIT HUB <span className="group-hover:translate-x-2 transition-transform">→</span>
         </Link>
       </div>
 
-      <div className="mt-5 flex gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {DENIM.map((src, idx) => (
-          <div key={idx} className="min-w-[220px] md:min-w-[280px]">
-            <div className="aspect-[3/4]">
-              <ImgOrPlaceholder src={src} alt="Denim" className="h-full w-full" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {DENIM.map((item, idx) => (
+          <motion.div 
+            key={idx}
+            whileHover={{ y: -20 }}
+            className="relative aspect-[3/4] rounded-[3rem] overflow-hidden border border-white/5"
+          >
+            <ImgOrPlaceholder src={item.src} className="h-full w-full grayscale hover:grayscale-0 transition-all duration-700" />
+            <div className="absolute bottom-6 left-6">
+              <span className="bg-black/20 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full text-[10px] font-bold tracking-widest text-white">
+                {item.label}
+              </span>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-
-      <Link
-        to="/denim-hub"
-        className="mt-4 inline-flex md:hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-extrabold hover:bg-white/10"
-      >
-        Visit Denim Hub →
-      </Link>
     </div>
   );
 }

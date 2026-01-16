@@ -1,152 +1,131 @@
-// src/pages/Home.jsx
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
-import { brand } from "../data/content.js";
+import { Star, ArrowRight } from "lucide-react";
 
+// Components
 import HomeShell from "../components/home/HomeShell.jsx";
-import SnapSection from "../components/home/SnapSection.jsx";
-import SectionNav from "../components/home/SectionNav.jsx";
-import ImgOrPlaceholder from "../components/home/ImgOrPlaceholder.jsx";
-import FloatingCollage from "../components/home/FloatingCollage.jsx";
+import MarqueeGallery from "../components/home/MarqueeGallery.jsx";
 import ServicesGrid from "../components/home/ServicesGrid.jsx";
-import HowItWorks from "../components/home/HowItWorks.jsx";
-import Ratings from "../components/home/Ratings.jsx";
 import DenimPreview from "../components/home/DenimPreview.jsx";
 import FinalCTA from "../components/home/FinalCTA.jsx";
-import MarqueeGallery from "../components/home/MarqueeGallery.jsx";
+import HowItWorks from "../components/home/HowItWorks.jsx";
 
 export default function Home() {
+  const { scrollYProgress } = useScroll();
+  
+  // Background Image Animation (Keeping your cinematic shrink)
+  const imgScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.9]);
+  const imgOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0.4]);
+  const imgBlur = useTransform(scrollYProgress, [0, 0.2], ["blur(0px)", "blur(15px)"]);
+
   return (
     <HomeShell>
-      {/* HERO */}
-      {/* HERO (full image + overlay text) */}
-<section id="hero" className="relative">
-  <div className="relative mx-auto w-full max-w-6xl px-4 md:px-6 pt-4 md:pt-8 pb-10">
-    <div className="relative overflow-hidden rounded-3xl border border-white/10">
-      {/* Full image background */}
-      <div className="absolute inset-0">
-       <img
-  src="/home/hero/founder.jpg"
-  alt="BIGFARRYS Founder"
-  className="h-full w-full object-cover object-top md:object-center"
-/>
+      {/* 1. HERO SECTION - Back to the Pink Vibe */}
+      <section className="relative h-screen bg-[#050505] flex items-center justify-center overflow-hidden">
+        
+        {/* BACKGROUND ANIMATION */}
+        <motion.div 
+          style={{ scale: imgScale, opacity: imgOpacity, filter: imgBlur }}
+          className="absolute inset-0 z-0"
+        >
+          <img 
+            src="/home/hero/founder.jpg" 
+            alt="Bigfarrys Founder" 
+            className="w-full h-full object-cover object-top"
+          />
+          {/* Subtle Pink Overlays */}
+          <div className="absolute inset-0 bg-black/40 md:bg-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505]" />
+        </motion.div>
 
-        {/* Overlay (fade image + add girly glow) */}
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,42,166,0.22),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(0,140,255,0.16),transparent_55%)]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
-      </div>
-
-      {/* Content */}
-      <div className="relative px-5 pt-16 pb-10 md:px-10 md:pt-20 md:pb-16">
-        <div className="text-xs uppercase tracking-[0.18em] text-white/70">
-          BIGFARRYS • Lagos (Ikorodu) • Ilaro, Ogun State
-        </div>
-
-        <h1 className="mt-4 max-w-3xl text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.02]">
-          Make your brand
-          <span className="block gradient-text">impossible to ignore.</span>
-        </h1>
-
-        <p className="mt-4 max-w-xl text-sm md:text-base text-white/75">
-          At BIGFARRYS, we believe your business, brand, and personal style deserve nothing less than excellence. That’s why we’ve created a full range of services designed to elevate you, your ideas, and your visibility.
-Tell us which of our services do you need today? 🫶🏽
-
-        </p>
-
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-          <Link
-            to="/services"
-            className="inline-flex justify-center rounded-2xl border border-white/10 bg-white/15 px-5 py-4 text-sm font-extrabold hover:bg-white/20"
-          >
-            Explore Services →
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => {
-              const shell = document.getElementById("home-shell");
-              const el = document.getElementById("gallery");
-              if (!shell || !el) return;
-              const shellTop = shell.getBoundingClientRect().top;
-              const elTop = el.getBoundingClientRect().top;
-              shell.scrollTo({ top: shell.scrollTop + (elTop - shellTop) - 12, behavior: "smooth" });
-            }}
-            className="inline-flex justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-extrabold hover:bg-white/10"
-          >
-            See results ↓
-          </button>
-        </div>
-
-        <div className="mt-8 grid gap-3 sm:grid-cols-3">
-          <div className="glass rounded-2xl px-4 py-4">
-            <div className="text-lg font-extrabold">Fast</div>
-            <div className="text-xs text-white/65 mt-1">Delivery + support</div>
+        {/* HERO TEXT */}
+        <div className="relative z-10 text-center px-6 max-w-7xl">
+          <div className="mb-6 inline-flex items-center gap-3 px-4 py-2 rounded-full border border-pink-500/20 bg-pink-500/5 backdrop-blur-xl">
+            <span className="text-[10px] font-black tracking-[0.4em] text-pink-500 uppercase">Est. 2024 • Bigfarrys Studio</span>
           </div>
-          <div className="glass rounded-2xl px-4 py-4">
-            <div className="text-lg font-extrabold">Premium</div>
-            <div className="text-xs text-white/65 mt-1">Clean, girly, bold</div>
-          </div>
-          <div className="glass rounded-2xl px-4 py-4">
-            <div className="text-lg font-extrabold">Website-first</div>
-            <div className="text-xs text-white/65 mt-1">WhatsApp summary only</div>
+
+          <h1 className="text-[12vw] md:text-[10rem] font-black tracking-tighter leading-[0.8] mb-8 text-white uppercase">
+            MAKE YOUR BRAND <br />
+            <span className="gradient-text italic font-serif normal-case">Impossible to ignore.</span>
+          </h1>
+
+          <p className="text-lg md:text-3xl text-white/90 max-w-3xl mx-auto font-medium leading-tight mb-12">
+            Through advertisign, design, signs and print, we make your brand more income-generating than ever before.
+            <span className="text-pink-500 block mt-2 font-black italic">Elite for the top 1%.</span>
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+            <Link 
+              to="/services" // Direct to Studio as requested
+              className="group w-full sm:w-auto px-12 py-6 bg-white text-black font-black rounded-full hover:bg-pink-500 hover:text-white transition-all duration-500 flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(236,72,153,0.3)]"
+            >
+              SECURE YOUR SLOT <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+            </Link>
+            
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <div className="flex text-yellow-500 gap-1">
+                {[...Array(5)].map((_, i) => <Star key={i} size={18} fill="currentColor" />)}
+              </div>
+              <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">Top Rated Studio</span>
+            </div>
           </div>
         </div>
+      </section>
 
-        <SectionNav nextId="gallery" showPrev={false} className="justify-end" />
-      </div>
-    </div>
-  </div>
-</section>
+      {/* 2. RATINGS SECTION - Visual Trust with Pink Accents */}
+      <section className="relative z-20 pb-32 bg-[#050505]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-white/[0.02] border border-white/5 rounded-[3rem] p-10 md:p-20 shadow-2xl">
+            <div className="grid lg:grid-cols-3 gap-16 items-center">
+              <div className="text-center lg:text-left">
+                <div className="flex justify-center lg:justify-start gap-1 text-pink-500 mb-6">
+                  {[...Array(5)].map((_, i) => <Star key={i} fill="currentColor" size={28} />)}
+                </div>
+                <h2 className="text-6xl font-black text-white tracking-tighter">5.0</h2>
+                <p className="text-white/40 uppercase tracking-[0.3em] text-xs font-bold mt-2">Client Satisfaction</p>
+              </div>
+              
+              <div className="lg:col-span-2 grid md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <p className="text-white/70 italic font-serif text-xl leading-relaxed">
+                    "Bigfarrys took my brand from "unknown" to public in just one week."
+                  </p>
+                  <div className="h-px w-12 bg-pink-500" />
+                  <span className="block text-[10px] font-black text-white/40 uppercase tracking-widest"> Fashion Brand</span>
+                </div>
+                <div className="space-y-4">
+                  <p className="text-white/70 italic font-serif text-xl leading-relaxed">
+                    "The ROI was instant. The most professional creative direction we've ever had."
+                  </p>
+                  <div className="h-px w-12 bg-pink-500" />
+                  <span className="block text-[10px] font-black text-white/40 uppercase tracking-widest">Skin care Brand</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* COLLAGE (full-bleed background feel) */}
-      <section id="gallery" className="relative py-10 md:py-14">
-  <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
-    <div className="text-xs uppercase tracking-[0.18em] text-white/60">RESULTS</div>
-    <h2 className="mt-2 text-2xl md:text-4xl font-extrabold tracking-tight">
-      Proof that sells.
-    </h2>
-    <p className="mt-2 max-w-2xl text-sm md:text-base text-white/70">
-      Clean work. Girly feel. Real outcomes.
-    </p>
+      {/* 3. CONTENT FLOW */}
+      <div className="bg-[#050505]">
+        <section className="py-24">
+          <div className="max-w-7xl mx-auto px-6 mb-16">
+            <h2 className="text-5xl md:text-8xl font-black tracking-tighter text-white">SELECTED WORK</h2>
+          </div>
+          <MarqueeGallery />
+        </section>
 
-    <div className="mt-6">
-      <MarqueeGallery />
-    </div>
-
-    <SectionNav prevId="hero" nextId="services" />
-  </div>
-</section>
-
-      {/* SERVICES */}
-      <SnapSection id="services">
-        <ServicesGrid />
-        <SectionNav prevId="gallery" nextId="how-it-works" />
-      </SnapSection>
-
-      {/* HOW IT WORKS */}
-      <SnapSection id="how-it-works">
         <HowItWorks />
-        <SectionNav prevId="services" nextId="ratings" />
-      </SnapSection>
 
-      {/* RATINGS */}
-      <SnapSection id="ratings">
-        <Ratings />
-        <SectionNav prevId="how-it-works" nextId="denim" />
-      </SnapSection>
+        {/* Clean wrapping to fix the Vite Error */}
+        <div className="max-w-7xl mx-auto px-6 space-y-32 py-32">
+          <ServicesGrid />
+          <DenimPreview />
+        </div>
 
-      {/* DENIM */}
-      <SnapSection id="denim">
-        <DenimPreview />
-        <SectionNav prevId="ratings" nextId="final" />
-      </SnapSection>
-
-      {/* FINAL CTA */}
-      <SnapSection id="final">
         <FinalCTA />
-        <SectionNav prevId="denim" showNext={false} />
-      </SnapSection>
+      </div>
+
     </HomeShell>
   );
 }

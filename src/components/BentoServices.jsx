@@ -1,94 +1,92 @@
 import { motion } from "framer-motion";
-import GlassCard from "./GlassCard.jsx";
 import { services } from "../data/content.js";
-
-const toneGradients = {
-  pink: "from-pink-500/25 via-transparent to-transparent",
-  navy: "from-sky-400/18 via-transparent to-transparent",
-  violet: "from-violet-500/20 via-transparent to-transparent"
-};
+import { ArrowUpRight } from "lucide-react";
 
 export default function BentoServices() {
   return (
-    <section className="px-3 md:px-6 mt-6">
-      <div className="mx-auto max-w-6xl">
-        {/* Title row */}
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-extrabold">
-              Services that get you <span className="gradient-text">seen</span>
+    <section className="section-pad bg-navy-base">
+      <div className="mx-auto max-w-7xl">
+        
+        {/* Title row - Bold & Impactful */}
+        <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
+          <div className="max-w-3xl">
+            <span className="text-pink-500 font-black tracking-[0.4em] text-xs uppercase">Premium Solutions</span>
+            <h2 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.85] mt-4 text-white">
+              SERVICES THAT GET <br /> YOU <span className="gradient-text">SEEN.</span>
             </h2>
-            <p className="text-white/65 mt-2 max-w-2xl">
-              Tap any service to message BIGFARRYS instantly — built for mobile users.
-            </p>
           </div>
-
-          <a
-            href="/services"
-            className="hidden md:inline-flex h-11 px-4 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition font-semibold"
-          >
-            View all
-          </a>
+          <p className="text-white/40 text-lg italic max-w-xs md:text-right border-l md:border-l-0 md:border-r border-white/10 pl-6 md:pl-0 md:pr-6">
+            Tap any service to message BIGFARRYS instantly.
+          </p>
         </div>
 
         {/* Bento grid */}
-        <div className="mt-5 grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {services.map((s, idx) => {
-            // Bento sizing
+            // High-end Bento Sizing Logic
             const span =
-              idx === 0 ? "md:col-span-7" :
-              idx === 1 ? "md:col-span-5" :
-              idx === 2 ? "md:col-span-6" :
-              idx === 3 ? "md:col-span-6" :
-              idx === 4 ? "md:col-span-5" :
-              "md:col-span-7";
-
-            const gradient = toneGradients[s.tone] || toneGradients.navy;
+              idx === 0 ? "md:col-span-8 md:h-[500px]" :
+              idx === 1 ? "md:col-span-4 md:h-[500px]" :
+              idx === 2 ? "md:col-span-4 md:h-[450px]" :
+              idx === 3 ? "md:col-span-8 md:h-[450px]" :
+              "md:col-span-6 md:h-[400px]";
 
             return (
               <motion.a
                 key={s.title}
                 href={s.ctaHref}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.99 }}
-                className={`${span} block`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -8 }}
+                className={`${span} group relative block overflow-hidden rounded-[3.5rem] border border-white/10 bg-white/5 p-10 transition-all duration-500 hover:bg-white/10`}
               >
-                <GlassCard className="p-5 md:p-6 relative overflow-hidden">
-                  {/* Soft gradient overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-70`} />
-                  <div className="relative">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="text-sm text-white/70">{s.badge}</div>
-                        <div className="mt-2 text-xl md:text-2xl font-extrabold leading-tight">
-                          {s.title}
-                        </div>
-                      </div>
-
-                      <div className="shrink-0 px-3 py-1 rounded-xl bg-white/10 border border-white/10 text-sm font-semibold">
-                        {s.price}
-                      </div>
+                {/* Background Glow Effect */}
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-pink-500/10 blur-[80px] group-hover:bg-pink-500/20 transition-all duration-700" />
+                
+                <div className="relative h-full flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-black tracking-[0.3em] uppercase text-white/40 group-hover:text-pink-500 transition-colors">
+                        {s.badge}
+                      </span>
+                      <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-white leading-tight">
+                        {s.title}
+                      </h3>
                     </div>
-
-                    <p className="text-white/65 mt-3">{s.desc}</p>
-
-                    <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                      Tap to enquire on WhatsApp
+                    
+                    {/* Minimalist Price Tag */}
+                    <div className="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-white/60 group-hover:border-pink-500 group-hover:text-white transition-all">
+                      {s.price}
                     </div>
                   </div>
-                </GlassCard>
+
+                  <div className="mt-8 flex flex-col gap-6">
+                    <p className="text-white/40 text-lg font-light leading-relaxed max-w-md group-hover:text-white/70 transition-colors">
+                      {s.desc}
+                    </p>
+
+                    <div className="flex items-center gap-4">
+                       <div className="h-12 w-12 rounded-full bg-white text-navy-base flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-all duration-500">
+                          <ArrowUpRight size={20} />
+                       </div>
+                       <span className="text-[10px] font-black uppercase tracking-widest text-white/20 group-hover:text-white transition-colors">
+                         Secure Slot via WhatsApp
+                       </span>
+                    </div>
+                  </div>
+                </div>
               </motion.a>
             );
           })}
         </div>
 
-        <a
-          href="/services"
-          className="md:hidden mt-4 h-12 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15 transition font-semibold grid place-items-center"
-        >
-          View all services
-        </a>
+        {/* Footer CTA */}
+        <div className="mt-16 text-center">
+            <a href="/services" className="text-white/20 hover:text-pink-500 transition-colors font-black uppercase tracking-[0.5em] text-[10px]">
+                Explore Full Directory — Explore Full Directory
+            </a>
+        </div>
       </div>
     </section>
   );
