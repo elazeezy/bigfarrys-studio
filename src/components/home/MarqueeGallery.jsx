@@ -39,14 +39,16 @@ export default function MarqueeGallery() {
           >
             {/* The Image Container */}
             <div className="w-full h-full rounded-[4rem] overflow-hidden border border-white/10 bg-white/5 shadow-2xl transition-all duration-700 group-hover:rounded-[2.5rem] group-hover:scale-[0.98]">
-              <img 
-                src={item.src} 
-                alt={item.label} 
-                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+             
+             <img
+             src={item.src}
+             alt={item.label}
+                 className="..."
                 onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/500x700/111d2f/ffffff?text=Studio+Work";
-                }}
-              />
+             // Stop the loop by removing the broken source entirely
+              e.target.style.display = 'none'; 
+          }}
+               />
               
               {/* Subtle Pink Glow on Hover */}
               <div className="absolute inset-0 bg-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

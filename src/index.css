@@ -1,45 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@1,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  /* Sophisticated Studio Navy - Not too dark, not too bright */
-  --navy-base: #0a1628; 
-  --navy-light: #12213a;
-  --pink-brand: #ff2aa6;
-  --white-glass: rgba(255, 255, 255, 0.05);
+  --navy-base: #020617;   /* Deep Navy for Backgrounds */
+  --navy-card: #0f172a;   /* Slightly lighter Navy for Boxes/Steps */
+  --hot-pink: #ec4899;    /* Your Signature Pink */
 }
 
-body {
-  background-color: var(--navy-base);
-  color: #f1f5f9; /* Off-white for softer reading */
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  body {
+    @apply bg-[#020617] text-white; /* Forces Navy background everywhere */
+  }
+
+  /* Force all "Grey" cards (like in Step 1, 2, 3) to Navy + Pink borders */
+  .bg-white\/5, .bg-slate-900, .bg-zinc-900 {
+    background-color: var(--navy-card) !important;
+    border-color: rgba(236, 72, 153, 0.2) !important; /* Subtle pink border */
+  }
+
+  /* Force all Blue/Purple buttons to Pink */
+  .bg-indigo-600, .bg-blue-600, .bg-violet-600 {
+    background-color: var(--hot-pink) !important;
+  }
 }
 
-/* THE "LIGHTENED" EFFECT: Adding subtle gradients so the site isn't flat */
-.bg-studio {
-  background: 
-    radial-gradient(circle at 0% 0%, rgba(255, 42, 166, 0.08) 0%, transparent 35%),
-    radial-gradient(circle at 100% 100%, rgba(0, 242, 255, 0.05) 0%, transparent 35%),
-    linear-gradient(180deg, #0a1628 0%, #101d31 100%);
-}
-
-/* Spacing Utility for "Less Tight" feel */
-.section-pad {
-  @apply py-24 md:py-40 px-6;
-}
-
-/* Floating Glass Dock Style */
-.glass-dock {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.gradient-text {
-  background: linear-gradient(90deg, #ff2aa6, #ec4899, #8b5cf6);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Add this class to your footer's main wrapper */
+.footer-mobile-safe {
+  padding-bottom: 120px; /* This ensures the content clears the bottom nav */
 }

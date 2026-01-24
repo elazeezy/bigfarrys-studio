@@ -39,37 +39,35 @@ export default function Home() {
         </motion.div>
 
         {/* HERO TEXT */}
-        <div className="relative z-10 text-center px-6 max-w-7xl">
-          <div className="mb-6 inline-flex items-center gap-3 px-4 py-2 rounded-full border border-pink-500/20 bg-pink-500/5 backdrop-blur-xl">
-            <span className="text-[10px] font-black tracking-[0.4em] text-pink-500 uppercase">Est. 2024 • Bigfarrys Studio</span>
-          </div>
+        {/* HERO TEXT */}
+<div className="relative z-10 text-center px-6 max-w-7xl">
+  {/* The "Small Label" */}
+  <div className="mb-6 inline-flex items-center gap-3 px-4 py-2 rounded-full border border-pink-500/30 bg-pink-500/5 backdrop-blur-md">
+    <span className="text-[10px] font-black tracking-[0.4em] text-pink-500 uppercase">
+      The Visual Authority Studio
+    </span>
+  </div>
 
-          <h1 className="text-[12vw] md:text-[10rem] font-black tracking-tighter leading-[0.8] mb-8 text-white uppercase">
-            MAKE YOUR BRAND <br />
-            <span className="gradient-text italic font-serif normal-case">Impossible to ignore.</span>
-          </h1>
+  {/* The Power Headline */}
+  <h1 className="text-[10vw] md:text-[8rem] font-black tracking-tighter leading-[0.85] mb-8 text-white uppercase">
+    MAKE YOUR BRAND <br />
+    <span className="text-pink-500 italic font-serif normal-case drop-shadow-[0_0_30px_rgba(236,72,153,0.3)]">
+      Impossible to ignore.
+    </span>
+  </h1>
 
-          <p className="text-lg md:text-3xl text-white/90 max-w-3xl mx-auto font-medium leading-tight mb-12">
-            Through advertisign, design, signs and print, we make your brand more income-generating than ever before.
-            <span className="text-pink-500 block mt-2 font-black italic">Elite for the top 1%.</span>
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
-            <Link 
-              to="/services" // Direct to Studio as requested
-              className="group w-full sm:w-auto px-12 py-6 bg-white text-black font-black rounded-full hover:bg-pink-500 hover:text-white transition-all duration-500 flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(236,72,153,0.3)]"
-            >
-              SECURE YOUR SLOT <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-            </Link>
-            
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <div className="flex text-yellow-500 gap-1">
-                {[...Array(5)].map((_, i) => <Star key={i} size={18} fill="currentColor" />)}
-              </div>
-              <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">Top Rated Studio</span>
-            </div>
-          </div>
-        </div>
+  <p className="text-lg md:text-2xl text-slate-300 max-w-2xl mx-auto font-medium leading-tight mb-12">
+    At BIGFARRYS, we help your brand make more money through advertisemnts, signs and prints, designs and lots more. Ready ? 
+    click the button below and be happier in a week. 
+  </p>
+  
+  {/* The High-End Button */}
+  <Link to="/services" className="group relative inline-flex items-center gap-4 bg-pink-500 px-12 py-6 rounded-full text-white font-black hover:scale-105 transition-all duration-500">
+    START YOUR PROJECT
+    <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+    <div className="absolute inset-0 rounded-full bg-pink-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+  </Link>
+</div>
       </section>
 
       {/* 2. RATINGS SECTION - Visual Trust with Pink Accents */}
