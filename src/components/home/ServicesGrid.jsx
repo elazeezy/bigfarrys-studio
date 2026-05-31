@@ -1,44 +1,57 @@
-// src/components/home/ServicesGrid.jsx
 import { Link } from "react-router-dom";
-import ImgOrPlaceholder from "./ImgOrPlaceholder.jsx";
+import { ArrowUpRight } from "lucide-react";
 import { services } from "../../data/content.js";
-
-const serviceImage = (slug) => `/home/services/${slug}.jpg`;
 
 export default function ServicesGrid() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
-      <div className="mb-5">
-        <div className="text-xs uppercase tracking-[0.18em] text-white/60">Services</div>
-        <h2 className="mt-2 text-2xl md:text-4xl font-extrabold tracking-tight">
-          Everything you need, inside one home.
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm md:text-base text-white/70">
-          Choose a service, see full details, upload files, pay by transfer, and send a summary.
+    <div>
+      <p className="eyebrow mb-4">Our Services</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-14">
+        <h2 className="heading-lg">EVERYTHING YOU<br /><span className="font-serif italic font-bold opacity-50">need, in one place.</span></h2>
+        <p className="text-espresso/60 max-w-xs text-sm leading-relaxed">
+          Choose a service, see full details, upload files, pay by transfer.
         </p>
       </div>
 
-      <div className="grid gap-4 md:gap-5 md:grid-cols-2">
-        {services.map((s) => (
+      <div className="grid md:grid-cols-2 gap-5">
+        {services.map((s, idx) => (
           <Link
             key={s.slug}
             to={`/services/${s.slug}`}
-            className="group rounded-3xl border border-white/10 bg-white/5 hover:bg-white/10 transition overflow-hidden"
+            className="group relative overflow-hidden rounded-4xl border border-espresso/10 bg-cream-100
+                       hover:border-espresso/25 hover:shadow-lg transition-all duration-400"
           >
-            <div className="aspect-[16/9] w-full">
-              <ImgOrPlaceholder src={serviceImage(s.slug)} alt={s.title} className="h-full w-full" />
+            {/* Image area */}
+            <div className="aspect-[16/9] w-full overflow-hidden bg-cream-200">
+              <img
+                src={`/home/services/${s.slug}.jpg`}
+                alt={s.title}
+                className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-105"
+                onError={(e) => {
+                  e.target.parentElement.style.background = `hsl(${25 + idx * 15}, 30%, 85%)`;
+                  e.target.style.display = "none";
+                }}
+              />
             </div>
 
-            <div className="p-4 md:p-5">
-              <div className="text-xs text-white/60">{s.badge}</div>
-              <div className="mt-2 text-lg md:text-xl font-extrabold tracking-tight">
+            {/* Content */}
+            <div className="p-6 md:p-8">
+              <p className="eyebrow mb-2">{s.badge}</p>
+              <h3 className="text-xl md:text-2xl font-black text-espresso tracking-tight mb-2">
                 {s.title}
-              </div>
-              <div className="mt-1 text-sm text-white/70">{s.short}</div>
+              </h3>
+              <p className="text-espresso/60 text-sm leading-relaxed">{s.short}</p>
 
-              <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 group-hover:text-white">
-                View details <span className="text-white/50 group-hover:text-white/80">→</span>
+              <div className="mt-6 inline-flex items-center gap-2 text-xs font-black tracking-widest uppercase
+                              text-espresso/40 group-hover:text-espresso transition-colors duration-300">
+                View Packages <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>
+            </div>
+
+            {/* Corner accent */}
+            <div className="absolute top-5 right-5 w-8 h-8 rounded-full border border-espresso/10 bg-cream-50
+                            flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <ArrowUpRight size={14} className="text-espresso" />
             </div>
           </Link>
         ))}

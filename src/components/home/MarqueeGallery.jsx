@@ -1,73 +1,67 @@
 import { motion } from "framer-motion";
 
-// Reduced to 5 high-impact images for a cleaner, luxury look
-const REFINED_GALLERY = [
-  { src: "/home/collage/advert-1.jpg", label: "ADVERT" },
-  { src: "/home/collage/edit-1.jpg", label: "EDIT" },
-  { src: "/home/collage/cac-1.jpg", label: "CAC" },
-  { src: "/home/collage/signage-1.jpg", label: "SIGNS" },
-  { src: "/image_cad10a.jpg", label: "FEATURE" }, 
+const GALLERY = [
+  { src: "/home/collage/advert-1.jpg",  label: "Advert",  rotate: -1.5 },
+  { src: "/home/collage/edit-1.jpg",    label: "Editing",  rotate: 1.2 },
+  { src: "/home/collage/signage-1.jpg", label: "Signage", rotate: -0.8 },
+  { src: "/home/collage/cac-1.jpg",     label: "CAC",     rotate: 1.8 },
+  { src: "/image_cad10a.jpg",           label: "Featured", rotate: -1.2 },
 ];
 
-// Duplicate the set to ensure the infinite loop never breaks
-const doubleImages = [...REFINED_GALLERY, ...REFINED_GALLERY];
+/* Only keep items whose image actually loads — filter on error */
+const DOUBLED = [...GALLERY, ...GALLERY];
 
 export default function MarqueeGallery() {
   return (
-    <div className="relative w-full overflow-hidden py-20 bg-navy-base">
-      
-      {/* Luxury Edge Fades: These "melt" the images into your navy background */}
-      <div className="absolute inset-y-0 left-0 w-32 md:w-80 z-20 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/80 to-transparent pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-32 md:w-80 z-20 bg-gradient-to-l from-[#0a1628] via-[#0a1628]/80 to-transparent pointer-events-none" />
+    <div className="relative w-full overflow-hidden">
+      {/* Edge fades */}
+      <div className="absolute inset-y-0 left-0 w-20 md:w-40 z-20 bg-gradient-to-r from-[#EDE0CC] to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-20 md:w-40 z-20 bg-gradient-to-l from-[#EDE0CC] to-transparent pointer-events-none" />
 
-      <motion.div 
-        className="flex gap-10 w-max"
-        animate={{ 
-          x: [0, -1600] // Adjust this number based on your card widths
-        }}
-        transition={{ 
-          duration: 50, // Slower duration = more luxury feel
-          repeat: Infinity, 
-          ease: "linear" 
-        }}
-        whileHover={{ animationPlayState: "paused" }} // Pauses for the user to admire the work
-      >
-        {doubleImages.map((item, idx) => (
-          <div 
-            key={idx} 
-            className="relative group w-[320px] h-[450px] md:w-[500px] md:h-[650px] flex-shrink-0"
-          >
-            {/* The Image Container */}
-            <div className="w-full h-full rounded-[4rem] overflow-hidden border border-white/10 bg-white/5 shadow-2xl transition-all duration-700 group-hover:rounded-[2.5rem] group-hover:scale-[0.98]">
-             
-             <img
-             src={item.src}
-             alt={item.label}
-                 className="..."
-                onError={(e) => {
-             // Stop the loop by removing the broken source entirely
-              e.target.style.display = 'none'; 
-          }}
-               />
-              
-              {/* Subtle Pink Glow on Hover */}
-              <div className="absolute inset-0 bg-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
-
-            {/* Minimalist Floating Label - Animates up on hover */}
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:bottom-12 z-30">
-              <span className="bg-white text-navy-base px-8 py-3 rounded-full text-[10px] font-black tracking-[0.3em] uppercase shadow-2xl whitespace-nowrap">
-                {item.label}
-              </span>
-            </div>
-          </div>
+      <div className="flex gap-5 w-max animate-marquee py-6">
+        {DOUBLED.map((item, idx) => (
+          <MarqueeCard key={idx} item={item} idx={idx} />
         ))}
-      </motion.div>
-
-      {/* Background Decorative Text (Optional - Subtle Watermark) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 opacity-[0.02] pointer-events-none select-none">
-        <h2 className="text-[20vw] font-black leading-none">BIGFARRYS</h2>
       </div>
     </div>
   );
 }
+
+function MarqueeCard({ item, idx }) {
+  const [hidden, setHidden] = useState(false);
+
+  if (hidden) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20, rotate: item.rotate }}
+      animate={{ opacity: 1, y: 0, rotate: item.rotate }}
+      transition={{ delay: (idx % 5) * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ scale: 0.97, rotate: 0, transition: { duration: 0.4 } }}
+      className="relative group flex-shrink-0 w-[200px] h-[280px] md:w-[280px] md:h-[380px]"
+    >
+      <div className="w-full h-full rounded-3xl overflow-hidden shadow-lg"
+           style={{ border: "1px solid rgba(92,45,26,0.08)" }}>
+        <img
+          src={item.src}
+          alt={item.label}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={() => setHidden(true)}
+        />
+        <div className="absolute inset-0 bg-espresso/20 opacity-0 group-hover:opacity-100 transition-opacity duration-400 rounded-3xl" />
+      </div>
+
+      {/* Label on hover */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 translate-y-2
+                      group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-350 z-10 whitespace-nowrap">
+        <span className="bg-cream-50 text-espresso px-5 py-2 rounded-full text-[10px]
+                         font-black tracking-[0.25em] uppercase shadow-lg">
+          {item.label}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
+/* useState needed inside the component */
+import { useState } from "react";

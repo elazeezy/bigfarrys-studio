@@ -1,33 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --navy-base: #020617;   /* Deep Navy for Backgrounds */
-  --navy-card: #0f172a;   /* Slightly lighter Navy for Boxes/Steps */
-  --hot-pink: #ec4899;    /* Your Signature Pink */
-}
-
 @layer base {
+  :root {
+    --cream: #F2E4CE;
+    --cream-light: #FDF8F2;
+    --espresso: #5C2D1A;
+    --espresso-dark: #3B1A0C;
+    --mocha: #7C4A2D;
+    --sand: #C9A882;
+    --bark: #9B6B47;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-[#020617] text-white; /* Forces Navy background everywhere */
+    background-color: var(--cream-light);
+    color: var(--espresso);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Force all "Grey" cards (like in Step 1, 2, 3) to Navy + Pink borders */
-  .bg-white\/5, .bg-slate-900, .bg-zinc-900 {
-    background-color: var(--navy-card) !important;
-    border-color: rgba(236, 72, 153, 0.2) !important; /* Subtle pink border */
-  }
-
-  /* Force all Blue/Purple buttons to Pink */
-  .bg-indigo-600, .bg-blue-600, .bg-violet-600 {
-    background-color: var(--hot-pink) !important;
+  ::selection {
+    background-color: var(--espresso);
+    color: var(--cream-light);
   }
 }
 
-/* Add this class to your footer's main wrapper */
+@layer components {
+  /* Core card surface — white so it pops off any cream bg */
+  .card-warm {
+    @apply bg-white rounded-4xl;
+    border: 1px solid rgba(92, 45, 26, 0.08);
+  }
+
+  /* Editorial divider line */
+  .divider-warm {
+    @apply h-px w-full bg-espresso/10;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center gap-3 bg-espresso text-cream-50 px-8 py-4 rounded-full font-bold tracking-wide
+           hover:bg-espresso-dark transition-all duration-300 hover:scale-[1.03] active:scale-[0.98];
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center gap-3 border border-espresso text-espresso px-8 py-4 rounded-full font-bold tracking-wide
+           hover:bg-espresso hover:text-cream-50 transition-all duration-300;
+  }
+
+  /* Section label eyebrow */
+  .eyebrow {
+    @apply text-[10px] font-black tracking-[0.35em] uppercase text-bark;
+  }
+
+  /* Heading editorial style */
+  .heading-xl {
+    @apply text-5xl md:text-8xl font-black tracking-tighter leading-[0.88] text-espresso;
+  }
+
+  .heading-lg {
+    @apply text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] text-espresso;
+  }
+}
+
+/* Mobile bottom tab safe spacing */
 .footer-mobile-safe {
-  padding-bottom: 120px; /* This ensures the content clears the bottom nav */
+  padding-bottom: 120px;
+}
+
+/* Marquee keyframe */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 55s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

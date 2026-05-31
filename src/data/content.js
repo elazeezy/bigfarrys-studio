@@ -15,8 +15,8 @@ const WHATSAPP = (text) =>
 export const services = [
   {
     slug: "advert",
-    title: "BIGFARRYS ADVERT",
-    badge: "✨ Advertisement Services",
+    title: "Social Media Adverts",
+    badge: "Advertisement Services",
     short: "Promotional content that gets your brand seen and noticed.",
     desc:
       "Get your brand seen, heard, and noticed with quality promotional content that attracts the right audience.",
@@ -54,8 +54,8 @@ export const services = [
 
   {
     slug: "editing",
-    title: "BIGFARRYS EDIT",
-    badge: "🎨 Picture Editing",
+    title: "Photography and Editing",
+    badge: "Photography and Editing",
     short: "Touch-ups to full transformations — clean, premium, creative edits.",
     desc:
       "From simple touch-ups to full transformations, our editing brings your images to life with clarity, style, and creativity.",
@@ -99,8 +99,8 @@ export const services = [
 
   {
     slug: "cac",
-    title: "CAC Registration",
-    badge: "📝 CAC Registration",
+    title: "Business Registration (CAC)",
+    badge: "CAC Registration",
     short: "We handle the paperwork — you focus on business.",
     desc:
       "Let us handle the paperwork, the stress, and the process. You focus on your business — we’ll get you registered seamlessly.",
@@ -114,8 +114,8 @@ export const services = [
 
   {
     slug: "signage",
-    title: "BIGFARRYS SIGNS & PRINTS",
-    badge: "🚧 Business Signage",
+    title: "Signs and Prints",
+    badge: "Business Signage and Prints",
     short: "Bold signage and prints that make your brand impossible to ignore.",
     desc:
       "Stand out from the crowd with bold, professional signage that makes your brand impossible to ignore.",

@@ -4,7 +4,8 @@ import { ArrowUpRight } from "lucide-react";
 
 export default function BentoServices() {
   return (
-    <section className="section-pad bg-navy-base">
+    /* We add the id="services-section" here */
+    <section id="services-section" className="section-pad bg-navy-base">
       <div className="mx-auto max-w-7xl">
         
         {/* Title row - Bold & Impactful */}

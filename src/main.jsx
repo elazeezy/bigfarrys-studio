@@ -7,12 +7,10 @@ import "./index.css";
 import { ThemeProvider } from "./providers/ThemeProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <BrowserRouter>
-        <App />
-        <Toaster richColors position="top-center" />
-      </BrowserRouter>
-    </ThemeProvider>
-  </React.StrictMode>
+  <ThemeProvider>
+    <BrowserRouter>
+      <App />
+      <Toaster richColors position="top-center" />
+    </BrowserRouter>
+  </ThemeProvider>
 );

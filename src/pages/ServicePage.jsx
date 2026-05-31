@@ -1,19 +1,33 @@
-// src/pages/ServicePage.jsx
 import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Copy, Check, ArrowRight, Megaphone, Camera, Layers, FileText, Clock } from "lucide-react";
 import { services, brand, payment } from "../data/content.js";
 import { supabase } from "../lib/supabaseClient.js";
 
-const money = (n) => (n ? `₦${Number(n).toLocaleString("en-NG")}` : "DM");
+const ICON_MAP = { advert: Megaphone, editing: Camera, signage: Layers, cac: FileText };
+const money = (n) => (n ? `N${Number(n).toLocaleString("en-NG")}` : "DM");
+const safeFileName = (name = "proof") => name.replace(/[^\w.\-]+/g, "_");
 
-function safeFileName(name = "proof") {
-  return name.replace(/[^\w.\-]+/g, "_");
+function groupPackages(packages = []) {
+  const map = {};
+  for (const p of packages) {
+    const g = p.group || "Packages";
+    if (!map[g]) map[g] = [];
+    map[g].push(p);
+  }
+  return Object.entries(map);
 }
+
+const inputCls =
+  "w-full h-12 rounded-2xl bg-cream-50 border border-espresso/12 px-5 text-espresso " +
+  "placeholder-espresso/30 outline-none focus:border-espresso/35 focus:bg-white " +
+  "transition-all duration-200 text-sm font-medium";
 
 export default function ServicePage() {
   const { slug } = useParams();
-
   const service = useMemo(() => services.find((s) => s.slug === slug), [slug]);
+  const Icon = ICON_MAP[slug] || Layers;
 
   const [selectedId, setSelectedId] = useState(service?.packages?.[0]?.id ?? "");
   const selectedPkg = useMemo(
@@ -21,161 +35,88 @@ export default function ServicePage() {
     [service, selectedId]
   );
 
-  // Customer form
-  const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [details, setDetails] = useState("");
-
-  // Proof upload
+  const [fullName, setFullName]   = useState("");
+  const [phone, setPhone]         = useState("");
+  const [email, setEmail]         = useState("");
+  const [details, setDetails]     = useState("");
   const [proofFile, setProofFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-
-  // UI feedback
-  const [copiedKey, setCopiedKey] = useState(null); // "bank" | "acc" | "name"
-  const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-
-  // After submit
-  const [createdOrder, setCreatedOrder] = useState(null); // row from orders
+  const [copiedKey, setCopiedKey] = useState(null);
+  const [errorMsg, setErrorMsg]   = useState("");
+  const [orderId, setOrderId]     = useState(null);
   const [waSummary, setWaSummary] = useState("");
+  const [done, setDone]           = useState(false);
 
-  const bucket = import.meta.env.VITE_SUPABASE_BUCKET || "payment-proofs";
+  const bucket  = import.meta.env.VITE_SUPABASE_BUCKET || "payment-proofs";
+  const grouped = useMemo(() => groupPackages(service?.packages), [service]);
 
   if (!service) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-10">
-        <div className="glass rounded-2xl p-6 border border-white/10">
-          <div className="text-white/70">Service not found.</div>
-          <Link to="/services" className="inline-block mt-3 underline">
-            Back to services
-          </Link>
+      <div className="min-h-screen bg-cream-50 flex items-center justify-center px-6">
+        <div className="bg-white rounded-4xl p-10 text-center max-w-sm">
+          <p className="text-espresso/55 text-sm mb-6">Service not found.</p>
+          <Link to="/services" className="btn-primary text-sm">Back to Services</Link>
         </div>
       </div>
     );
   }
 
   const copyText = async (key, value) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedKey(key);
-      setTimeout(() => setCopiedKey(null), 900);
-    } catch {
-      // ignore (some browsers block clipboard without https)
-    }
+    try { await navigator.clipboard.writeText(value); setCopiedKey(key); setTimeout(() => setCopiedKey(null), 1200); }
+    catch { /* ignore */ }
   };
 
-  const buildWhatsAppSummary = (orderRow) => {
-    const lines = [];
-    lines.push(`BIGFARRYS — ORDER SUMMARY ✅`);
-    lines.push(`Order ID: ${orderRow?.id || "-"}`);
-    lines.push(`Service: ${service.title}`);
-
-    if (selectedPkg) {
-      lines.push(
-        `Package: ${selectedPkg.name}${selectedPkg.price ? ` (${money(selectedPkg.price)})` : ""}`
-      );
-      if (selectedPkg.eta) lines.push(`ETA: ${selectedPkg.eta}`);
-    }
-
-    lines.push(``);
-    lines.push(`Customer:`);
-    lines.push(`Name: ${fullName || "-"}`);
-    lines.push(`Phone: ${phone || "-"}`);
-    if (email) lines.push(`Email: ${email}`);
-    if (details) {
-      lines.push(``);
-      lines.push(`Details:`);
-      lines.push(details);
-    }
-
-    lines.push(``);
-    lines.push(`Payment: Transfer`);
-    lines.push(`${payment.bankName}`);
-    lines.push(`${payment.accountNumber} — ${payment.accountName}`);
-    lines.push(``);
-    lines.push(`I have paid / I am paying now. Please confirm. ✅`);
-
+  const buildWA = (id) => {
+    const lines = [
+      "BIGFARRYS ORDER SUMMARY",
+      `Order ID: ${id}`,
+      `Service: ${service.title}`,
+      ...(selectedPkg
+        ? [`Package: ${selectedPkg.name}${selectedPkg.price ? ` (${money(selectedPkg.price)})` : ""}`,
+           ...(selectedPkg.eta ? [`ETA: ${selectedPkg.eta}`] : [])]
+        : []),
+      "", "Customer Details:",
+      `Name: ${fullName}`, `Phone: ${phone}`,
+      ...(email   ? [`Email: ${email}`]      : []),
+      ...(details ? ["", `Note: ${details}`] : []),
+      "", "Payment: Bank Transfer",
+      `${payment.bankName}`,
+      `Account: ${payment.accountNumber}`,
+      `Name: ${payment.accountName}`,
+      "", "I have paid. Please confirm my order.",
+    ];
     return `https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
   };
 
   const submitOrder = async () => {
     setErrorMsg("");
-    setSuccessMsg("");
-
-    if (!selectedPkg) {
-      setErrorMsg("Please select a package.");
-      return;
-    }
-    if (!fullName.trim()) {
-      setErrorMsg("Please enter your full name.");
-      return;
-    }
-    if (!phone.trim()) {
-      setErrorMsg("Please enter your phone number.");
-      return;
-    }
-    if (!proofFile) {
-      setErrorMsg("Please upload your payment proof screenshot.");
-      return;
-    }
+    if (!selectedPkg)     return setErrorMsg("Please select a package first.");
+    if (!fullName.trim()) return setErrorMsg("Please enter your full name.");
+    if (!phone.trim())    return setErrorMsg("Please enter your phone number.");
+    if (!proofFile)       return setErrorMsg("Please upload your payment proof screenshot.");
 
     setUploading(true);
-
     try {
-      // 1) Upload proof to storage
-      const orderId = crypto.randomUUID();
-      const ext = proofFile.name?.split(".").pop() || "jpg";
-      const fileName = safeFileName(`proof_${Date.now()}.${ext}`);
-
-      // Keep paths organized per service + order id
-      const proofPath = `${service.slug}/${orderId}/${fileName}`;
+      const id        = crypto.randomUUID();
+      const ext       = proofFile.name?.split(".").pop() || "jpg";
+      const proofPath = `${service.slug}/${id}/${safeFileName(`proof_${Date.now()}.${ext}`)}`;
 
       const { error: uploadErr } = await supabase.storage
-        .from(bucket)
-        .upload(proofPath, proofFile, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: proofFile.type || undefined,
-        });
-
+        .from(bucket).upload(proofPath, proofFile, { cacheControl: "3600", upsert: false });
       if (uploadErr) throw uploadErr;
 
-      // 2) Insert row into orders table
-      const payload = {
-        id: orderId, // only works if your table allows custom id; if not, remove this line
-        service_slug: service.slug,
-        service_title: service.title,
+      const { error: insertErr } = await supabase.from("orders").insert([{
+        id, service_slug: service.slug, service_title: service.title,
+        package_id: selectedPkg.id, package_name: selectedPkg.name, amount: selectedPkg.price ?? null,
+        customer_name: fullName.trim(), customer_phone: phone.trim(),
+        customer_email: email.trim() || null, customer_details: details.trim() || null,
+        proof_bucket: bucket, proof_path: proofPath, status: "pending",
+      }]);
+      if (insertErr) throw insertErr;
 
-        package_id: selectedPkg.id,
-        package_name: selectedPkg.name,
-        amount: selectedPkg.price ?? null,
-
-        customer_name: fullName.trim(),
-        customer_phone: phone.trim(),
-        customer_email: email.trim() || null,
-        customer_details: details.trim() || null,
-
-        proof_bucket: bucket,
-        proof_path: proofPath,
-
-        status: "pending",
-      };
-const { error: insertErr } = await supabase
-  .from("orders")
-  .insert([payload]); // ✅ keep as array, safer
-
-if (insertErr) throw insertErr;
-
-// ✅ since we already generated orderId, we can build a local "created order"
-const localRow = { id: orderId, status: "pending" };
-setCreatedOrder(localRow);
-
-const wa = buildWhatsAppSummary(localRow);
-setWaSummary(wa);
-
-
-      setSuccessMsg("Order submitted successfully. You can now send the WhatsApp summary.");
+      setOrderId(id);
+      setWaSummary(buildWA(id));
+      setDone(true);
     } catch (e) {
       setErrorMsg(e?.message || "Something went wrong. Please try again.");
     } finally {
@@ -183,261 +124,298 @@ setWaSummary(wa);
     }
   };
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10">
-      {/* Top Banner */}
-      <section className="glass rounded-3xl border border-white/10 overflow-hidden">
-        <div className="relative h-[260px] md:h-[380px]">
-          <img
-            src={service.sampleImage || "/services/advert-sample.jpg"}
-            alt={`${service.title} sample`}
-            className="absolute inset-0 h-full w-full object-cover object-center"
-            onError={(e) => (e.currentTarget.style.display = "none")}
-          />
-          <div className="absolute inset-0 bg-black/45" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,42,166,0.22),transparent_55%)]" />
+  /* SUCCESS */
+  if (done) {
+    return (
+      <div className="min-h-screen bg-cream-50 flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-white rounded-4xl p-12 max-w-sm w-full text-center shadow-sm"
+          style={{ border: "1px solid rgba(92,45,26,0.08)" }}
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+            className="w-14 h-14 rounded-full bg-espresso flex items-center justify-center mx-auto mb-6"
+          >
+            <Check size={24} className="text-cream-50" strokeWidth={2.5} />
+          </motion.div>
+          <h2 className="font-black text-2xl text-espresso tracking-tight mb-2">Order submitted.</h2>
+          <p className="text-espresso/50 text-sm leading-relaxed mb-2">
+            Your order is saved. Send us the WhatsApp summary to confirm and get started.
+          </p>
+          <p className="text-espresso/25 text-xs mb-8 font-mono">ID: {orderId}</p>
+          <a
+            href={waSummary}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary justify-center w-full mb-4"
+          >
+            Send WhatsApp Summary <ArrowRight size={14} />
+          </a>
+          <Link to="/services" className="text-xs text-espresso/35 hover:text-espresso transition-colors">
+            Back to all services
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
-          <div className="relative p-6 md:p-10 max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.18em] text-white/70">
-              {service.badge}
+  return (
+    <div className="min-h-screen bg-cream-50">
+
+      {/* Hero */}
+      <div className="bg-espresso pt-28 pb-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-1.5 text-cream-50/40 hover:text-cream-50
+                       text-xs font-bold tracking-widest uppercase mb-8 transition-colors duration-200"
+          >
+            <ArrowLeft size={12} /> All Services
+          </Link>
+
+          <div className="flex items-start gap-5">
+            <div className="w-12 h-12 rounded-2xl bg-cream-50/10 flex items-center justify-center flex-shrink-0 mt-1">
+              <Icon size={22} className="text-sand" strokeWidth={1.75} />
             </div>
-            <h1 className="mt-3 text-3xl md:text-6xl font-extrabold tracking-tight leading-[1.03]">
-              {service.title}
-            </h1>
-            <p className="mt-3 text-white/75 md:text-lg">{service.desc}</p>
+            <div>
+              <p className="eyebrow text-sand mb-3">{service.badge}</p>
+              <h1
+                className="font-black tracking-tighter leading-tight text-cream-50 mb-3"
+                style={{ fontSize: "clamp(2rem, 5vw, 3.75rem)" }}
+              >
+                {service.title}
+              </h1>
+              <p className="text-cream-200/55 text-sm leading-relaxed max-w-lg">{service.desc}</p>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Packages + Booking */}
-      <section className="mt-6 grid gap-6 lg:grid-cols-2">
-        {/* Packages */}
-        <div className="glass rounded-3xl border border-white/10 p-5 md:p-7">
-          <div className="text-xs uppercase tracking-[0.18em] text-white/55">
-            Choose a package
+      <div className="max-w-3xl mx-auto px-6 py-10 flex flex-col gap-5">
+
+        {/* ── STEP 1: PACKAGES ── */}
+        <div className="bg-white rounded-4xl overflow-hidden" style={{ border: "1px solid rgba(92,45,26,0.08)" }}>
+          <div className="flex items-center gap-3 px-8 py-5 border-b border-espresso/6">
+            <span className="w-7 h-7 rounded-full bg-espresso text-cream-50 text-[11px] font-black
+                             flex items-center justify-center flex-shrink-0">1</span>
+            <div>
+              <h2 className="font-black text-espresso text-base tracking-tight">Choose a package</h2>
+              <p className="text-espresso/40 text-xs">Scroll sideways within each group to see all options.</p>
+            </div>
           </div>
-          <h2 className="mt-2 text-2xl md:text-3xl font-extrabold tracking-tight">
-            Pick what you want.
-          </h2>
-          <p className="mt-2 text-white/60">
-            Your order will be saved as <span className="text-white/80">Pending</span> until admin confirms.
-          </p>
 
-          <div className="mt-4 grid gap-3">
-            {(service.packages || []).map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setSelectedId(p.id)}
-                className={`text-left rounded-2xl border p-4 transition ${
-                  selectedId === p.id
-                    ? "border-pink-400/40 bg-white/10"
-                    : "border-white/10 bg-white/5 hover:bg-white/10"
-                }`}
+          <div className="p-6 flex flex-col gap-8">
+            {grouped.map(([groupName, pkgs], gi) => (
+              <motion.div
+                key={groupName}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: gi * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="font-extrabold tracking-tight">{p.name}</div>
-                    <div className="text-sm text-white/60 mt-1">
-                      {p.eta ? `ETA: ${p.eta}` : "ETA: —"}
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className="font-extrabold">{p.price ? money(p.price) : "DM"}</div>
-                    <div className="text-xs text-white/50 mt-1">
-                      {selectedId === p.id ? "Selected" : "Select"}
-                    </div>
-                  </div>
+                {/* Group label */}
+                <p className="text-[9px] font-black tracking-[0.35em] uppercase text-bark mb-3 px-1">
+                  {groupName}
+                </p>
+
+                {/* Horizontal scroll row of cards */}
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory"
+                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                  {pkgs.map((p, pi) => {
+                    const active = selectedId === p.id;
+                    return (
+                      <motion.button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setSelectedId(p.id)}
+                        initial={{ opacity: 0, x: 12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: gi * 0.07 + pi * 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        whileTap={{ scale: 0.96 }}
+                        className={`snap-start flex-shrink-0 flex flex-col gap-3 rounded-3xl p-5
+                                    text-left transition-all duration-300 min-w-[160px] max-w-[180px]
+                                    ${active
+                                      ? "bg-espresso shadow-lg shadow-espresso/20"
+                                      : "bg-cream-50 hover:bg-cream-100 border border-espresso/8 hover:border-espresso/20"
+                                    }`}
+                      >
+                        {/* Price */}
+                        <span className={`font-black text-xl leading-none ${active ? "text-sand" : "text-espresso"}`}>
+                          {p.price ? money(p.price) : "DM"}
+                        </span>
+
+                        {/* Name */}
+                        <span className={`font-bold text-xs leading-snug ${active ? "text-cream-50" : "text-espresso"}`}>
+                          {p.name}
+                        </span>
+
+                        {/* ETA chip */}
+                        {p.eta && (
+                          <div className={`flex items-center gap-1 mt-auto pt-2 border-t ${
+                            active ? "border-cream-50/15" : "border-espresso/8"
+                          }`}>
+                            <Clock size={10} className={active ? "text-cream-50/50" : "text-espresso/35"} />
+                            <span className={`text-[10px] font-semibold ${active ? "text-cream-50/50" : "text-espresso/40"}`}>
+                              {p.eta}
+                            </span>
+                          </div>
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
-              </button>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Booking */}
-        <div className="glass rounded-3xl border border-white/10 p-5 md:p-7">
-          <div className="text-xs uppercase tracking-[0.18em] text-white/55">
-            Book on the website
-          </div>
-          <h2 className="mt-2 text-2xl md:text-3xl font-extrabold tracking-tight">
-            Make payment & upload proof.
-          </h2>
-          <p className="mt-2 text-white/60">
-            Transfer to the account below, upload your receipt screenshot, then submit your order.
-          </p>
-
-          {/* Payment Card */}
-          <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4 md:p-5">
-            <div className="font-extrabold text-lg">Make payment</div>
-            <div className="text-sm text-white/60 mt-1">
-              Use your name as narration if possible.
-            </div>
-
-            <div className="mt-4 grid gap-3">
-              {/* Bank name */}
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                    Bank name
-                  </div>
-                  <div className="font-extrabold">{payment.bankName}</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => copyText("bank", payment.bankName)}
-                  className="h-10 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 font-semibold"
-                >
-                  {copiedKey === "bank" ? "Copied" : "Copy"}
-                </button>
-              </div>
-
-              {/* Account number */}
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                    Account number
-                  </div>
-                  <div className="font-extrabold">{payment.accountNumber}</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => copyText("acc", payment.accountNumber)}
-                  className="h-10 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 font-semibold"
-                >
-                  {copiedKey === "acc" ? "Copied" : "Copy"}
-                </button>
-              </div>
-
-              {/* Account name */}
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                    Account name
-                  </div>
-                  <div className="font-extrabold">{payment.accountName}</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => copyText("name", payment.accountName)}
-                  className="h-10 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 font-semibold"
-                >
-                  {copiedKey === "name" ? "Copied" : "Copy"}
-                </button>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/70">
-                After payment, upload proof and submit your order for confirmation.
-              </div>
+        {/* ── STEP 2: PAY + FORM ── */}
+        <div className="bg-white rounded-4xl overflow-hidden" style={{ border: "1px solid rgba(92,45,26,0.08)" }}>
+          <div className="flex items-center gap-3 px-8 py-5 border-b border-espresso/6">
+            <span className="w-7 h-7 rounded-full bg-espresso text-cream-50 text-[11px] font-black
+                             flex items-center justify-center flex-shrink-0">2</span>
+            <div>
+              <h2 className="font-black text-espresso text-base tracking-tight">Pay and submit your order</h2>
+              <p className="text-espresso/40 text-xs">Transfer to our account, then fill in your details.</p>
             </div>
           </div>
+
+          {/* Selected package summary */}
+          <AnimatePresence mode="wait">
+            {selectedPkg && (
+              <motion.div
+                key={selectedPkg.id}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="mx-6 mt-6 bg-espresso rounded-2xl px-6 py-4 flex items-center justify-between"
+              >
+                <div>
+                  <p className="text-cream-50/45 text-[9px] font-black uppercase tracking-widest mb-0.5">
+                    Selected package
+                  </p>
+                  <p className="text-cream-50 font-black text-sm">{selectedPkg.name}</p>
+                </div>
+                <p className="text-sand font-black text-2xl">
+                  {selectedPkg.price ? money(selectedPkg.price) : "DM"}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Bank details */}
+          <div className="px-8 pt-7 pb-0">
+            <p className="eyebrow mb-4">Bank transfer details</p>
+            <div className="flex flex-col gap-2">
+              {[
+                { label: "Bank",           key: "bank", value: payment.bankName },
+                { label: "Account Number", key: "acc",  value: payment.accountNumber },
+                { label: "Account Name",   key: "name", value: payment.accountName },
+              ].map(({ label, key, value }) => (
+                <div key={key} className="flex items-center justify-between gap-4 bg-cream-50 rounded-2xl px-5 py-3.5">
+                  <div className="min-w-0">
+                    <p className="text-[9px] font-black tracking-widest uppercase text-espresso/35 mb-0.5">{label}</p>
+                    <p className="font-bold text-espresso text-sm truncate">{value}</p>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    type="button"
+                    onClick={() => copyText(key, value)}
+                    className="flex items-center gap-1.5 text-[10px] font-black tracking-wide uppercase
+                               text-espresso/40 hover:text-espresso bg-white hover:bg-cream-100
+                               px-3.5 py-2 rounded-full transition-all duration-200 flex-shrink-0"
+                    style={{ border: "1px solid rgba(92,45,26,0.08)" }}
+                  >
+                    {copiedKey === key ? <><Check size={10} /> Copied</> : <><Copy size={10} /> Copy</>}
+                  </motion.button>
+                </div>
+              ))}
+            </div>
+            <p className="text-espresso/35 text-xs leading-relaxed mt-4">
+              Use your name as the narration when making the transfer.
+            </p>
+          </div>
+
+          <div className="h-px bg-espresso/6 mx-8 my-7" />
 
           {/* Form */}
-          <div className="mt-5 grid gap-3">
-            <input
-              className="h-12 rounded-2xl bg-white/5 border border-white/10 px-4 outline-none focus:border-pink-400/40"
-              placeholder="Full name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-            <input
-              className="h-12 rounded-2xl bg-white/5 border border-white/10 px-4 outline-none focus:border-pink-400/40"
-              placeholder="Phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <input
-              className="h-12 rounded-2xl bg-white/5 border border-white/10 px-4 outline-none focus:border-pink-400/40"
-              placeholder="Email (optional)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <textarea
-              className="min-h-[140px] rounded-2xl bg-white/5 border border-white/10 px-4 py-3 outline-none focus:border-pink-400/40"
-              placeholder="Extra note (optional)"
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-            />
-
-            {/* Upload proof */}
-            <div className="rounded-2xl bg-white/5 border border-white/10 px-4 py-4">
-              <div className="font-extrabold">Upload payment proof</div>
-              <div className="text-sm text-white/60 mt-1">
-                Upload a screenshot/receipt. Admin will confirm or reject.
-              </div>
-
-              <input
-                type="file"
-                accept="image/*"
-                className="mt-3 block w-full text-sm"
-                onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+          <div className="px-8 pb-8">
+            <p className="eyebrow mb-5">Your details</p>
+            <div className="flex flex-col gap-3">
+              <input className={inputCls} placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <input className={inputCls} placeholder="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <input className={inputCls} placeholder="Email address (optional)" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <textarea
+                className={`${inputCls} h-auto min-h-[88px] py-3.5 resize-none`}
+                placeholder="Any extra instructions (optional)"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
               />
 
-              {proofFile ? (
-                <div className="mt-2 text-xs text-white/70">
-                  Selected: <span className="text-white/90">{proofFile.name}</span>
-                </div>
-              ) : null}
-            </div>
-
-            {/* Messages */}
-            {errorMsg ? (
-              <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-white/85">
-                {errorMsg}
+              <div className="rounded-2xl bg-cream-50 p-5" style={{ border: "1px solid rgba(92,45,26,0.08)" }}>
+                <p className="font-black text-espresso text-sm mb-1">Payment proof</p>
+                <p className="text-xs text-espresso/40 mb-4 leading-relaxed">
+                  Upload a screenshot of your bank transfer receipt so we can confirm faster.
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-xs text-espresso/50
+                             file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0
+                             file:bg-espresso file:text-cream-50 file:text-xs file:font-black
+                             file:cursor-pointer hover:file:bg-espresso-dark file:transition-colors"
+                  onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+                />
+                {proofFile && (
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-bark font-semibold">
+                    <Check size={11} /> {proofFile.name}
+                  </p>
+                )}
               </div>
-            ) : null}
 
-            {successMsg ? (
-              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-white/85">
-                {successMsg}
-              </div>
-            ) : null}
+              <AnimatePresence>
+                {errorMsg && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="rounded-2xl bg-red-50 border border-red-200 px-5 py-3.5 text-sm text-red-700 font-medium"
+                  >
+                    {errorMsg}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            {/* Submit */}
-            <button
-              type="button"
-              onClick={submitOrder}
-              disabled={uploading}
-              className="mt-1 h-12 rounded-2xl bg-pink-500/90 hover:bg-pink-500 transition font-extrabold disabled:opacity-50"
-            >
-              {uploading ? "Submitting..." : "Submit order"}
-            </button>
-
-            {/* WhatsApp only appears after successful insert */}
-            {waSummary ? (
-              <a
-                href={waSummary}
-                target="_blank"
-                rel="noreferrer"
-                className="h-12 rounded-2xl bg-white/10 hover:bg-white/15 transition font-extrabold grid place-items-center border border-white/10"
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                type="button"
+                onClick={submitOrder}
+                disabled={uploading}
+                className="btn-primary justify-center mt-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send WhatsApp summary →
-              </a>
-            ) : null}
+                {uploading ? "Submitting your order..." : "Submit Order"}
+              </motion.button>
 
-            {createdOrder ? (
-              <div className="text-xs text-white/60">
-                Saved as: <span className="text-white/85">{createdOrder.status}</span> • Order ID:{" "}
-                <span className="text-white/85">{createdOrder.id}</span>
-              </div>
-            ) : null}
+              <p className="text-center text-xs text-espresso/30 leading-relaxed">
+                After submitting you will get a pre-filled WhatsApp message to send us for final confirmation.
+              </p>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* Back */}
-      <div className="mt-6">
         <Link
           to="/services"
-          className="inline-flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-4 py-3 hover:bg-white/10 transition"
+          className="inline-flex items-center gap-1.5 text-espresso/30 hover:text-espresso
+                     text-xs font-bold tracking-wide transition-colors self-start pb-8"
         >
-          ← Back to services
+          <ArrowLeft size={12} /> Back to all services
         </Link>
       </div>
     </div>
   );
 }
-
-console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
-
-
-

@@ -1,63 +1,58 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Home, LayoutGrid, Shirt, Phone } from 'lucide-react';
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Home, LayoutGrid, Shirt, Phone } from "lucide-react";
+
+const TABS = [
+  { path: "/",         label: "Home",     Icon: Home },
+  { path: "/services", label: "Services", Icon: LayoutGrid },
+  { path: "/denim",    label: "Denim",    Icon: Shirt },
+  { path: "/contact",  label: "Contact",  Icon: Phone },
+];
 
 export default function BottomTabs() {
-  const location = useLocation();
-
-  const tabs = [
-    {
-      path: "/",
-      label: "HOME",
-      icon: <Home size={20} />
-    },
-    {
-      path: "/services", // Updated path
-      label: "SERVICES", // Updated label from STUDIO to SERVICES
-      icon: <LayoutGrid size={20} />
-    },
-    {
-      path: "/denim",
-      label: "DENIM",
-      icon: <Shirt size={20} />
-    },
-    {
-      path: "/contact",
-      label: "CONTACT",
-      icon: <Phone size={20} />
-    }
-  ];
+  const { pathname } = useLocation();
 
   return (
-    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[92%] max-w-md">
-      <div className="bg-[#020617]/80 backdrop-blur-2xl border border-white/10 rounded-full p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-between">
-        {tabs.map((tab) => {
-          const isActive = location.pathname === tab.path;
-          
+    <nav className="hidden">
+      <div className="bg-cream-50/95 backdrop-blur-2xl border border-espresso/12
+                      rounded-full p-1.5 shadow-[0_8px_32px_rgba(92,45,26,0.16)]
+                      flex items-center justify-between">
+        {TABS.map(({ path, label, Icon }) => {
+          const active = pathname === path;
           return (
             <Link
-              key={tab.path}
-              to={tab.path}
-              className={`relative flex items-center justify-center gap-2 px-4 py-3 rounded-full transition-all duration-500 group ${
-                isActive 
-                  ? "text-white" 
-                  : "text-white/40 hover:text-white/70"
+              key={path}
+              to={path}
+              className={`relative flex items-center justify-center gap-1.5
+                          px-4 py-2.5 rounded-full transition-all duration-350 ${
+                active ? "text-cream-50" : "text-espresso/40 hover:text-espresso/70"
               }`}
             >
-              {/* Active Background Glow */}
-              {isActive && (
-                <div className="absolute inset-0 bg-pink-500 rounded-full shadow-[0_0_20px_rgba(236,72,153,0.4)] z-0" />
+              {active && (
+                <motion.div
+                  layoutId="tab-pill"
+                  className="absolute inset-0 bg-espresso rounded-full"
+                  transition={{ type: "spring", stiffness: 420, damping: 38 }}
+                />
               )}
-              
-              <span className="relative z-10 transition-transform duration-300 group-active:scale-90">
-                {tab.icon}
-              </span>
-              
-              {isActive && (
-                <span className="relative z-10 text-[10px] font-black tracking-widest uppercase animate-in fade-in slide-in-from-left-2 duration-300">
-                  {tab.label}
-                </span>
-              )}
+              <Icon
+                size={17}
+                strokeWidth={active ? 2.5 : 1.75}
+                className="relative z-10 transition-transform duration-300"
+              />
+              <AnimatePresence>
+                {active && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="relative z-10 text-[10px] font-black tracking-wider uppercase overflow-hidden whitespace-nowrap"
+                  >
+                    {label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </Link>
           );
         })}
