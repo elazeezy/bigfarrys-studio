@@ -4,6 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Copy, Check, ArrowRight, Megaphone, Camera, Layers, FileText, Clock } from "lucide-react";
 import { services, brand, payment } from "../data/content.js";
 import { supabase } from "../lib/supabaseClient.js";
+import ProofGallery from "../components/ProofGallery.jsx";
+
+const PROOF_IMAGES = {
+  advert: Array.from({ length: 10 }, (_, i) => `/services/advert/ads${i + 1}.jpeg`),
+};
 
 const ICON_MAP = { advert: Megaphone, editing: Camera, signage: Layers, cac: FileText };
 const money = (n) => (n ? `N${Number(n).toLocaleString("en-NG")}` : "DM");
@@ -195,6 +200,15 @@ export default function ServicePage() {
           </div>
         </div>
       </div>
+
+      {/* ── SOCIAL PROOF GALLERY ── */}
+      {PROOF_IMAGES[slug] && (
+        <ProofGallery
+          images={PROOF_IMAGES[slug]}
+          label="Client reviews"
+          heading="Real results, real clients."
+        />
+      )}
 
       <div className="max-w-3xl mx-auto px-6 py-10 flex flex-col gap-5">
 
