@@ -7,7 +7,32 @@ import { supabase } from "../lib/supabaseClient.js";
 import ProofGallery from "../components/ProofGallery.jsx";
 
 const PROOF_IMAGES = {
-  advert: Array.from({ length: 10 }, (_, i) => `/services/advert/ads${i + 1}.jpeg`),
+  advert:  Array.from({ length: 10 }, (_, i) => `/services/advert/ads${i + 1}.jpeg`),
+  editing: Array.from({ length: 9  }, (_, i) => `/services/editing/edit${i + 1}.jpeg`),
+  signage: Array.from({ length: 8  }, (_, i) => `/services/signage/signage${i + 1}.jpeg`),
+  cac:     Array.from({ length: 2  }, (_, i) => `/services/cac/cac${i + 1}.jpeg`),
+};
+
+const PROOF_CONFIG = {
+  advert:  { label: "Client reviews",  heading: "Real results, real clients." },
+  editing: { label: "Our work",        heading: "Photos and edits we have delivered." },
+  signage: { label: "Our products",    heading: "Browse what we make." },
+  cac:     { label: "Client reviews",  heading: "Businesses we have registered." },
+};
+
+// Maps signage package ID → product thumbnail image
+const SIGNAGE_THUMBS = {
+  "sign-1":  "/services/signage/signage1.jpeg",
+  "sign-2":  "/services/signage/signage2.jpeg",
+  "sign-3":  "/services/signage/signage3.jpeg",
+  "sign-4":  "/services/signage/signage4.jpeg",
+  "sign-4b": "/services/signage/signage4.jpeg",
+  "sign-5":  "/services/signage/signage5.jpeg",
+  "sign-6a": "/services/signage/signage6.jpeg",
+  "sign-6b": "/services/signage/signage6.jpeg",
+  "sign-7":  "/services/signage/signage7.jpeg",
+  "sign-7b": "/services/signage/signage7.jpeg",
+  "sign-8":  "/services/signage/signage8.jpeg",
 };
 
 const ICON_MAP = { advert: Megaphone, editing: Camera, signage: Layers, cac: FileText };
@@ -201,12 +226,12 @@ export default function ServicePage() {
         </div>
       </div>
 
-      {/* ── SOCIAL PROOF GALLERY ── */}
+      {/* ── SOCIAL PROOF / PRODUCT GALLERY ── */}
       {PROOF_IMAGES[slug] && (
         <ProofGallery
           images={PROOF_IMAGES[slug]}
-          label="Client reviews"
-          heading="Real results, real clients."
+          label={PROOF_CONFIG[slug]?.label}
+          heading={PROOF_CONFIG[slug]?.heading}
         />
       )}
 
@@ -241,6 +266,7 @@ export default function ServicePage() {
                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
                   {pkgs.map((p, pi) => {
                     const active = selectedId === p.id;
+                    const thumb  = SIGNAGE_THUMBS[p.id] ?? null;
                     return (
                       <motion.button
                         key={p.id}
@@ -250,34 +276,57 @@ export default function ServicePage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: gi * 0.07 + pi * 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                         whileTap={{ scale: 0.96 }}
-                        className={`snap-start flex-shrink-0 flex flex-col gap-3 rounded-3xl p-5
-                                    text-left transition-all duration-300 min-w-[160px] max-w-[180px]
+                        className={`snap-start flex-shrink-0 flex flex-col rounded-3xl
+                                    text-left transition-all duration-300
+                                    ${thumb ? "min-w-[190px] max-w-[210px]" : "min-w-[160px] max-w-[180px] gap-3 p-5"}
                                     ${active
                                       ? "bg-espresso shadow-lg shadow-espresso/20"
                                       : "bg-cream-50 hover:bg-cream-100 border border-espresso/8 hover:border-espresso/20"
                                     }`}
                       >
-                        {/* Price */}
-                        <span className={`font-black text-xl leading-none ${active ? "text-sand" : "text-espresso"}`}>
-                          {p.price ? money(p.price) : "DM"}
-                        </span>
-
-                        {/* Name */}
-                        <span className={`font-bold text-xs leading-snug ${active ? "text-cream-50" : "text-espresso"}`}>
-                          {p.name}
-                        </span>
-
-                        {/* ETA chip */}
-                        {p.eta && (
-                          <div className={`flex items-center gap-1 mt-auto pt-2 border-t ${
-                            active ? "border-cream-50/15" : "border-espresso/8"
-                          }`}>
-                            <Clock size={10} className={active ? "text-cream-50/50" : "text-espresso/35"} />
-                            <span className={`text-[10px] font-semibold ${active ? "text-cream-50/50" : "text-espresso/40"}`}>
-                              {p.eta}
-                            </span>
+                        {/* Product thumbnail for signage */}
+                        {thumb && (
+                          <div className="w-full overflow-hidden rounded-t-3xl"
+                               style={{ height: 140 }}>
+                            <img
+                              src={thumb}
+                              alt={p.name}
+                              className="w-full h-full object-cover"
+                              draggable={false}
+                            />
                           </div>
                         )}
+
+                        <div className={`flex flex-col gap-2 ${thumb ? "p-4" : "flex-1"}`}>
+                          {/* Price */}
+                          <span className={`font-black text-xl leading-none ${active ? "text-sand" : "text-espresso"}`}>
+                            {p.price ? money(p.price) : "DM"}
+                          </span>
+
+                          {/* Name */}
+                          <span className={`font-bold text-xs leading-snug ${active ? "text-cream-50" : "text-espresso"}`}>
+                            {p.name}
+                          </span>
+
+                          {/* Note */}
+                          {p.note && (
+                            <span className={`text-[10px] leading-snug ${active ? "text-cream-50/55" : "text-espresso/40"}`}>
+                              {p.note}
+                            </span>
+                          )}
+
+                          {/* ETA chip */}
+                          {p.eta && (
+                            <div className={`flex items-center gap-1 mt-auto pt-2 border-t ${
+                              active ? "border-cream-50/15" : "border-espresso/8"
+                            }`}>
+                              <Clock size={10} className={active ? "text-cream-50/50" : "text-espresso/35"} />
+                              <span className={`text-[10px] font-semibold ${active ? "text-cream-50/50" : "text-espresso/40"}`}>
+                                {p.eta}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </motion.button>
                     );
                   })}

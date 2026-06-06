@@ -95,3 +95,32 @@
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* Grain overlay — sits on top of any section via ::before */
+.grain-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.038;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 160px 160px;
+}
+
+/* Dot-grid pattern */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(92,45,26,0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Radial warm glow — for espresso bg sections */
+.glow-warm::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(201,168,130,0.12) 0%, transparent 70%);
+  z-index: 0;
+}

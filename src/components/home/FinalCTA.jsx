@@ -3,8 +3,27 @@ import { ArrowRight, MessageCircle, MapPin, Phone } from "lucide-react";
 
 export default function FinalCTA() {
   return (
-    <section className="bg-espresso py-28 px-6">
-      <div className="max-w-2xl mx-auto text-center">
+    <section className="relative bg-espresso-dark py-28 px-6 overflow-hidden glow-warm">
+      {/* Decorative large background word */}
+      <div
+        aria-hidden
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+      >
+        <span
+          className="font-serif italic font-black text-cream-50 leading-none whitespace-nowrap"
+          style={{ fontSize: "clamp(8rem, 22vw, 22rem)", opacity: 0.03 }}
+        >
+          Bigfarrys
+        </span>
+      </div>
+
+      {/* Decorative corner circles */}
+      <div aria-hidden className="absolute -top-24 -left-24 w-64 h-64 rounded-full pointer-events-none"
+           style={{ background: "radial-gradient(circle, rgba(201,168,130,0.08) 0%, transparent 70%)" }} />
+      <div aria-hidden className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full pointer-events-none"
+           style={{ background: "radial-gradient(circle, rgba(201,168,130,0.06) 0%, transparent 70%)" }} />
+
+      <div className="relative z-10 max-w-2xl mx-auto text-center">
         <p className="eyebrow text-sand mb-6">Ready to start?</p>
 
         <h2

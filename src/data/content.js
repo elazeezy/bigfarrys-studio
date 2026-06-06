@@ -120,9 +120,18 @@ export const services = [
     desc:
       "Stand out from the crowd with bold, professional signage that makes your brand impossible to ignore.",
     sampleImage: "/services/signage-hero.jpg",
-    reviewImages: ["/services/signage/review-1.jpg", "/services/signage/review-2.jpg"],
     packages: [
-      { id: "sign-basic", group: "Signs & Prints", name: "Design + Print Prep", price: null, eta: "1–3 days" }
+      { id: "sign-1", group: "Flex Banners", name: "Large Flex Banner", price: 50000, eta: "2–3 days", note: "Price and size varies, starting from N50,000" },
+      { id: "sign-2", group: "Classy Signage", name: "Midi Classy Signage (Standard)", price: 25000, eta: "2–3 days" },
+      { id: "sign-5", group: "Classy Signage", name: "Midi Classy Signage (Premium)", price: 35000, eta: "2–3 days" },
+      { id: "sign-3", group: "Custom Apparel", name: "Customized Tees", price: 12000, eta: "2–3 days" },
+      { id: "sign-4", group: "Business Signage", name: "Rectangle Business Signage", price: 40000, eta: "2–3 days" },
+      { id: "sign-4b", group: "Business Signage", name: "Rectangle Business Signage (Multi-color)", price: 45000, eta: "2–3 days" },
+      { id: "sign-7", group: "Business Signage", name: "Rectangle Business Signage", price: 40000, eta: "2–3 days" },
+      { id: "sign-7b", group: "Business Signage", name: "Rectangle Business Signage (Multi-color)", price: 45000, eta: "2–3 days" },
+      { id: "sign-6a", group: "Neon Signage", name: "Neon (up to 10 letters)", price: 50000, eta: "3–5 days", note: "Price depends on writeup length" },
+      { id: "sign-6b", group: "Neon Signage", name: "Neon (custom quote)", price: null, eta: "DM us", note: "For longer writeups, DM for pricing" },
+      { id: "sign-8", group: "3D Signage", name: "Fabricated 3D Signage", price: 90000, eta: "5–7 days" }
     ]
   }
 ];

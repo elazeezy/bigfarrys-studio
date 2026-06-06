@@ -1,20 +1,28 @@
 import { useRef, useLayoutEffect, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Menu, X } from "lucide-react";
+import { MessageCircle, Menu, X, ChevronDown, Megaphone, Camera, Layers, FileText } from "lucide-react";
 
 const NAV = [
-  { path: "/",         label: "Home" },
+  { path: "/",        label: "Home" },
   { path: "/services", label: "Services" },
-  { path: "/denim",    label: "Denim" },
-  { path: "/contact",  label: "Contact" },
+  { path: "/denim",   label: "Denim" },
+  { path: "/contact", label: "Contact" },
+];
+
+const SERVICES = [
+  { path: "/services/advert",  label: "Social Media Adverts",      Icon: Megaphone, desc: "Reach thousands fast"         },
+  { path: "/services/editing", label: "Photography & Editing",     Icon: Camera,    desc: "Premium photos, same day"     },
+  { path: "/services/signage", label: "Signs & Prints",            Icon: Layers,    desc: "Bold signage for your brand"  },
+  { path: "/services/cac",    label: "CAC Registration",          Icon: FileText,  desc: "We handle all the paperwork"  },
 ];
 
 export default function Header() {
   const headerRef = useRef(null);
   const { pathname } = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled,   setScrolled]   = useState(false);
+  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
 
   useLayoutEffect(() => {
     const el = headerRef.current;
@@ -32,8 +40,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* close mobile menu on route change */
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => { setMenuOpen(false); setServicesOpen(false); }, [pathname]);
 
   return (
     <header ref={headerRef} className="absolute top-0 left-0 w-full z-50 px-5 pt-4">
@@ -63,7 +70,7 @@ export default function Header() {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-0.5">
           {NAV.map(({ path, label }) => {
-            const active = pathname === path;
+            const active = pathname === path || (path === "/services" && pathname.startsWith("/services"));
             return (
               <Link
                 key={path}
@@ -112,7 +119,7 @@ export default function Header() {
         </div>
       </motion.div>
 
-      {/* Mobile dropdown */}
+      {/* ── MOBILE DROPDOWN ── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -123,23 +130,117 @@ export default function Header() {
             className="md:hidden mx-auto max-w-7xl mt-2 bg-cream-50/98 backdrop-blur-2xl
                        border border-espresso/10 rounded-3xl p-4 shadow-xl"
           >
-            {NAV.map(({ path, label }) => {
-              const active = pathname === path;
-              return (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`flex items-center px-5 py-3.5 rounded-2xl text-sm font-semibold
-                               transition-colors duration-200 ${
-                    active
-                      ? "bg-espresso text-cream-50"
-                      : "text-espresso/65 hover:text-espresso hover:bg-espresso/6"
-                  }`}
+            {/* Home */}
+            <Link
+              to="/"
+              className={`flex items-center px-5 py-3.5 rounded-2xl text-sm font-semibold
+                           transition-colors duration-200 ${
+                pathname === "/"
+                  ? "bg-espresso text-cream-50"
+                  : "text-espresso/65 hover:text-espresso hover:bg-espresso/6"
+              }`}
+            >
+              Home
+            </Link>
+
+            {/* Services — expandable */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setServicesOpen((v) => !v)}
+                className={`w-full flex items-center justify-between px-5 py-3.5 rounded-2xl
+                             text-sm font-semibold transition-colors duration-200 ${
+                  pathname.startsWith("/services")
+                    ? "bg-espresso text-cream-50"
+                    : "text-espresso/65 hover:text-espresso hover:bg-espresso/6"
+                }`}
+              >
+                <span>Services</span>
+                <motion.div
+                  animate={{ rotate: servicesOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  {label}
-                </Link>
-              );
-            })}
+                  <ChevronDown size={15} />
+                </motion.div>
+              </button>
+
+              <AnimatePresence>
+                {servicesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-1 ml-3 flex flex-col gap-1 pb-1">
+                      {/* "All services" shortcut */}
+                      <Link
+                        to="/services"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl
+                                   text-espresso/50 hover:text-espresso hover:bg-espresso/5
+                                   transition-colors duration-200"
+                      >
+                        <span className="text-[10px] font-black tracking-[0.25em] uppercase text-bark">
+                          View all
+                        </span>
+                      </Link>
+
+                      {SERVICES.map(({ path, label, Icon, desc }) => {
+                        const active = pathname === path;
+                        return (
+                          <Link
+                            key={path}
+                            to={path}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl
+                                         transition-colors duration-200 ${
+                              active
+                                ? "bg-espresso/8 text-espresso"
+                                : "text-espresso/65 hover:text-espresso hover:bg-espresso/5"
+                            }`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-espresso/6 flex items-center justify-center flex-shrink-0">
+                              <Icon size={14} className="text-espresso" strokeWidth={1.75} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold leading-tight">{label}</p>
+                              <p className="text-[11px] text-espresso/40 font-medium">{desc}</p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Denim */}
+            <Link
+              to="/denim"
+              className={`flex items-center px-5 py-3.5 rounded-2xl text-sm font-semibold
+                           transition-colors duration-200 ${
+                pathname === "/denim"
+                  ? "bg-espresso text-cream-50"
+                  : "text-espresso/65 hover:text-espresso hover:bg-espresso/6"
+              }`}
+            >
+              Denim
+            </Link>
+
+            {/* Contact */}
+            <Link
+              to="/contact"
+              className={`flex items-center px-5 py-3.5 rounded-2xl text-sm font-semibold
+                           transition-colors duration-200 ${
+                pathname === "/contact"
+                  ? "bg-espresso text-cream-50"
+                  : "text-espresso/65 hover:text-espresso hover:bg-espresso/6"
+              }`}
+            >
+              Contact
+            </Link>
+
             <div className="h-px bg-espresso/8 my-3" />
             <a
               href="https://wa.me/2349069050668"

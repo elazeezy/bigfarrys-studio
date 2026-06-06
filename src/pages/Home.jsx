@@ -55,7 +55,7 @@ export default function Home() {
     <div className="w-full min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="relative h-[100svh] flex flex-col justify-center overflow-hidden">
+      <section className="relative h-[100svh] flex flex-col justify-center overflow-hidden grain-overlay">
         <div className="absolute inset-0 z-0">
           <img
             src="/home/hero/founder.jpg"
@@ -207,8 +207,12 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="bg-espresso py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative bg-espresso py-24 px-6 overflow-hidden">
+        {/* Subtle diagonal lines */}
+        <div aria-hidden className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "repeating-linear-gradient(135deg, rgba(201,168,130,0.04) 0px, rgba(201,168,130,0.04) 1px, transparent 1px, transparent 40px)"
+        }} />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-14">
             <div className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
@@ -242,22 +246,30 @@ export default function Home() {
       </section>
 
       {/* ── GALLERY ── */}
-      <section className="bg-[#EDE0CC] py-20">
-        <div className="max-w-6xl mx-auto px-6 mb-10">
-          <p className="eyebrow mb-3">Our work</p>
-          <h2
-            className="font-black tracking-tighter text-espresso"
-            style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
-          >
-            Proof we deliver.
-          </h2>
+      <section className="bg-[#EDE0CC] py-20 overflow-hidden">
+        <div className="max-w-6xl mx-auto px-6 mb-10 flex items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow mb-3">Our work</p>
+            <h2
+              className="font-black tracking-tighter text-espresso"
+              style={{ fontSize: "clamp(2rem, 4vw, 3rem)" }}
+            >
+              Proof we deliver.
+            </h2>
+          </div>
+          {/* Mobile swipe hint */}
+          <p className="md:hidden text-[10px] font-bold tracking-widest uppercase text-espresso/35 whitespace-nowrap pb-1">
+            Swipe to explore
+          </p>
         </div>
         <MarqueeGallery />
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="bg-cream-50 py-24 px-6">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative bg-cream-50 py-24 px-6 overflow-hidden">
+        {/* Dot-grid background detail */}
+        <div className="absolute inset-0 dot-grid opacity-60 pointer-events-none" />
+        <div className="relative z-10 max-w-6xl mx-auto">
           <HowItWorks />
         </div>
       </section>
